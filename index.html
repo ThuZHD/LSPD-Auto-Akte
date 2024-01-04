@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" placeholder="suchen" id="searchField">
+    <div id="searchBoxResult">
+    </div>
+
+    <div id="tableContainer">
+        <table id="table">
+        
+        </table>
+    </div>
+    
+    <input type="text" placeholder="Straftaten" id="Straftaten">
+    <input type="text" placeholder="Beteiligte" id="Beteiligte">
+    <input type="text" placeholder="Tathergang" id="Tathergang">
+    <input type="text" placeholder="Formalitäten" id="Formalitäten">
+    <input type="text" placeholder="Anmerkungen" id="Anmerkungen">
+    <div>
+        <p id="test"></p>
+    </div>
+    <button onclick="copy()">copy</button>
+
+    <style>
+        #searchBoxResult {
+            width: 50%;
+            aspect-ratio: 2/1;
+            border: 1px;
+            border-color: black;
+            border-style: solid;
+            overflow-y: scroll;
+        }
+
+        #searchResult {
+            width: 50%;
+        }
+
+        #searchField {
+            width: 50%;
+            aspect-ratio: 10/1;
+            font-size: 250%;
+        }
+
+        #tr {
+            float: left;
+        }
+
+        *{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+
+    <script>
+        const crime = [
+        {
+            "name": "Verstoß gegen die Arbeitszeitregelungen",
+            "prison": 0,    
+            "money": 15000 
+        },
+        {
+            "name": "Verstoß gegen die Vertragspflicht",
+            "prison": 0,    
+            "money": 12500 
+        },
+        {
+            "name": "Verstoß gegen die Vorliegepflicht",
+            "prison": 0,    
+            "money": 8500 
+        },
+        {
+            "name": "Verbot zur Kinderarbeit",
+            "prison": 20,    
+            "money": 18500 
+        },
+        {
+            "name": "Verstoß gegen die Jugendlichenarbeit",
+            "prison": 10,    
+            "money": 18500 
+        },
+        {
+            "name": "Verstoß gegen die Jugendlichentätigkeiten",
+            "prison": 0,    
+            "money": 12500 
+        },
+        {
+            "name": "Besitz illegaler Betäubungsmittel/Suchtmittel",
+            "prison": 0,    
+            "money": 15000
+        },
+        {
+            "name": "Besitz illegaler Betäubungsmittel/Suchtmittel (über 200 Stk.)",
+            "prison": 30,    
+            "money": 20000 
+        },
+        {
+            "name": "Herstellung von illegalen Betäubungsmittel/Suchtmittel",
+            "prison": 35,    
+            "money": 25000 
+        },
+        {
+            "name": "Verstoß gegen Anmeldepflicht",
+            "prison": 0,    
+            "money": 12500 
+        },
+        {
+            "name": "Verstoß gegen gemeldete Tätigkeiten",
+            "prison": 0,    
+            "money": 20000 
+        },
+        {
+            "name": "Verstoß gegen Glücksspielerlaubnis",
+            "prison": 0,    
+            "money": 25000 
+        },
+        {
+            "name": "Verstoß gegen die Grundsätze",
+            "prison": 0,    
+            "money": 15000 
+        },
+        {
+            "name": "Verstoß gegen die Schweigepflicht",
+            "prison": 0,    
+            "money": 30000 
+        },
+        {
+            "name": "Verstoß gegen die Informationspflicht",
+            "prison": 0,    
+            "money": 10000 
+        },
+        {
+            "name": "Willkürliche Verordnung/Ausstellung von Medikamenten",
+            "prison": 0,    
+            "money": 25000 
+        },
+        {
+            "name": "Verstoß gegen Pressekodex",
+            "prison": 0,    
+            "money": 10000 
+        },
+        {
+            "name": "Presseausweispflicht",
+            "prison": 0,    
+            "money": 7500 
+        },
+        {
+            "name": "Behinderung von Einsatzkräften",
+            "prison": 0,    
+            "money": 12500 
+        },
+        {
+            "name": "Gefährdung von Einsatzkräften",
+            "prison": 0,    
+            "money": 15000 
+        },
+        {
+            "name": "Erzwingen von Informationen",
+            "prison": 0,    
+            "money": 17500 
+        },
+        {
+            "name": "Vorteuschen einer Straftat",
+            "prison": 15,    
+            "money": 12500 
+        },
+        {
+            "name": "Hausfriedensbruch",
+            "prison": 0,    
+            "money": 12500 
+        },
+        {
+            "name": "Schwarzgeldbesitz",
+            "prison": 0,    
+            "money": 11500 
+        },
+        {
+            "name": "Durchbrechen von Absperren",
+            "prison": 0,    
+            "money": 13500 
+        },
+        {
+            "name": "Betreten von vertraulichen, gesicherten Anlagen (SG, ...)",
+            "prison": 15,    
+            "money": 25000 
+        },
+        {
+            "name": "Unangemeldete Versammlung (Demo, ...)",
+            "prison": 0,    
+            "money": 15000 
+        },
+        {
+            "name": "Körperverletzung",
+            "prison": 0,    
+            "money": 16500 
+        },
+        {
+            "name": "Rassismus",
+            "prison": 0,    
+            "money": 6000 
+        },
+        {
+            "name": "Erpressung",
+            "prison": 0,    
+            "money": 30000 
+        },
+        {
+            "name": "Nötigung",
+            "prison": 0,    
+            "money": 32000 
+        },
+        {
+            "name": "Sexismus / Sexuelle Belästigung",
+            "prison": 25,    
+            "money": 30000 
+        },
+        {
+            "name": "Drohung",
+            "prison": 0,    
+            "money": 25000 
+        },
+        {
+            "name": "Gewaltsame Drohung",
+            "prison": 15,   
+            "money": 32000 
+        },
+        {
+            "name": "Morddrohung",
+            "prison": 20,    
+            "money": 25000 
+        },
+        {
+            "name": "Freiheitsberaubung",
+            "prison": 30,    
+            "money": 42500 
+        },
+        {
+            "name": "Geiselnahme",
+            "prison": 35,    
+            "money": 50000 
+        },
+        {
+            "name": "Schwere Geiselnahme",
+            "prison": 40,
+            "money": 70000 
+        },
+        {
+            "name": "Gefährliche Körperverletzung",
+            "prison": 20,
+            "money": 35000 
+        },
+        {
+            "name": "Unterlassene Hilfeleistung",
+            "prison": 0,
+            "money": 7500 
+        },
+        {
+            "name": "Exhibitionismus",
+            "prison": 10,
+            "money": 16500 
+        },
+        {
+            "name": "Erregung öffentlichen Ärgernisses",
+            "prison": 0,
+            "money": 15000 
+        },
+        {
+            "name": "Schwere Körperverletzung",
+            "prison": 35,
+            "money": 50000 
+        },
+        {
+            "name": "Totschlag",
+            "prison": 40,
+            "money": 60000 
+        },
+        {
+            "name": "Fahrlässige Tötung",
+            "prison": 45,
+            "money": 75000 
+        },
+        {
+            "name": "Mord",
+            "prison": 80,
+            "money": 80000 
+        },
+        {
+            "name": "Beleidigung",
+            "prison": 0,
+            "money": 5000 
+        },
+        {
+            "name": "Belästigung",
+            "prison": 0,
+            "money": 5500 
+        },
+        {
+            "name": "Rufmord",
+            "prison": 0,
+            "money": 25000 
+        },
+        {
+            "name": "Diebstahl",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Einbruch",
+            "prison": 10,
+            "money": 16500 
+        },
+        {
+            "name": "Schwarzgeldverwendung / Schwarzgeldverabreitung",
+            "prison": 15,
+            "money": 16500 
+        },
+        {
+            "name": "Steuerhinterziehung",
+            "prison": 0,
+            "money": 13500 
+        },
+        {
+            "name": "Drogenhandel",
+            "prison": 15,
+            "money": 25000 
+        },
+        {
+            "name": "Schwerer Diebstahl",
+            "prison": 10,
+            "money": 25000 
+        },
+        {
+            "name": "Betrug",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Bestechung / Bestechlichkeit",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Handel mit illegalen Gegenständen",
+            "prison": 15,
+            "money": 25000 
+        },
+        {
+            "name": "Besitz illegaler Gegenstände (Sachgegenstände)",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Besitz von staatlichen Gegenstände (Sachgegenstände)",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Raub",
+            "prison": 20,
+            "money": 17500 
+        },
+        {
+            "name": "Schwerer Raub",
+            "prison": 30,
+            "money": 22000 
+        },
+        {
+            "name": "Nichtbeachtung amtlicher Anweisungen",
+            "prison": 0,
+            "money": 7500 
+        },
+        {
+            "name": "Behinderung von Behörderntätigkeiten",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Widerstand gegen Beamte",
+            "prison": 0,
+            "money": 15000 
+        },
+        {
+            "name": "Abhören Behördenfunk",
+            "prison": 0,
+            "money": 20000 
+        },
+        {
+            "name": "Entziehung polizeilicher Maßnahmen (Flucht)",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Amtsmissbrauch",
+            "prison": 15,
+            "money": 17500 
+        },
+        {
+            "name": "Sachbeschädigung",
+            "prison": 0,
+            "money": 10000 
+        },
+        {
+            "name": "Bildung einer terrorisstischen Vereinigung",
+            "prison": 45,
+            "money": 65000 
+        },
+        {
+            "name": "Mitglied einer terrorisstischen Vereinigung",
+            "prison": 40,
+            "money": 55000 
+        },
+        {
+            "name": "Agieren als organisiertes Verbrechen",
+            "prison": 10,
+            "money": 10000 
+        },
+        {
+            "name": "Nichtbeachtung des Gerichts (Verhalten vor Gericht, ...)",
+            "prison": 0,
+            "money": 6500 
+        },
+        {
+            "name": "Mahngebühren für staatliche Rechnungen",
+            "prison": 0,
+            "money": 12500 
+        },
+        {
+            "name": "Korruption Staatliche Behörde",
+            "prison": 45,
+            "money": 35000 
+        },
+        {
+            "name": "Falschaussage",
+            "prison": 0,
+            "money": 10000 
+        },
+        {
+            "name": "Falschaussage unter Eid",
+            "prison": 10,
+            "money": 15000 
+        },
+        {
+            "name": "Betreten von Sperrzonen (Ohne Erlaubnis)",
+            "prison": 15,
+            "money": 18000 
+        },
+        {
+            "name": "Besitz von gefälschten Dokumenten/Urkunden/...",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Fälschen von Dokumenten/Urkunden/...",
+            "prison": 15,
+            "money": 25000 
+        },
+        {
+            "name": "Tragen von falschen Titeln",
+            "prison": 0,
+            "money": 12000 
+        },
+        {
+            "name": "Unbestätigtes Visum",
+            "prison": 0,
+            "money": 20000 
+        },
+        {
+            "name": "Manipulation von Beweismitteln",
+            "prison": 10,
+            "money": 17500 
+        },
+        {
+            "name": "Führen eines unangemeldeten Fahrzeuges",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Illegales Straßenrennen",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Vermummungsverbot",
+            "prison": 0,
+            "money": 7500 
+        },
+        {
+            "name": "Falsche Namensangabe",
+            "prison": 0,
+            "money": 8000 
+        },
+        {
+            "name": "Missbrauch des Notrufs",
+            "prison": 0,
+            "money": 12000 
+        },
+        {
+            "name": "Amtsanmaßung",
+            "prison": 10,
+            "money": 15000 
+        },
+        {
+            "name": "Handel von Langwaffen",
+            "prison": 35,
+            "money": 35000
+        },
+        {
+            "name": "Illegaler Waffenbesitz",
+            "prison": 25,
+            "money": 30000
+        },
+        {
+            "name": "Besitz einer legalen Waffe ohne Waffenschein",
+            "prison": 0,
+            "money": 15000
+        },
+        {
+            "name": "Verstoß gegen Dienstwaffen außer Dienst",
+            "prison": 0,
+            "money": 17500 
+        },
+        {
+            "name": "Handel von Kurzwaffen",
+            "prison": 20,
+            "money": 25000
+        },
+        {
+            "name": "Unerlaubtes Benutzen einer Schusswaffe",
+            "prison": 10,
+            "money": 15000
+        },
+        {
+            "name": "Offenes Tragen von Waffen (Schuss-, Stich-, Hieb)",
+            "prison": 10,
+            "money": 12500
+        },
+        {
+            "name": "Fahren ohne Führerschein Klasse A",
+            "prison": 0,
+            "money": 9500
+        },
+        {
+            "name": "Fahren ohne Führerschein Klasse B",
+            "prison": 0,
+            "money": 12500
+        },
+        {
+            "name": "Fahren ohne Führerschein Klasse C",
+            "prison": 0,
+            "money": 16000
+        },
+    ]
+
+        var totalCrimes = []
+
+        var lastSearch = ""
+
+        setInterval(() => {
+            if(lastSearch != document.getElementById("searchField").value) {
+                lastSearch = document.getElementById("searchField").value
+                searchCrime()
+            }
+
+            document.getElementById("test").innerHTML = "Straftaten: " + document.getElementById("Straftaten").value + "<br> Beteiligte: " + document.getElementById("Beteiligte").value + "<br> Tathergang: " + document.getElementById("Tathergang").value + "<br> Formalitäten: " + document.getElementById("Formalitäten").value + "<br> Anmerkungen: " + document.getElementById("Anmerkungen").value
+        }, 10);
+
+        function searchCrime() {
+            document.querySelectorAll('.SearchResult').forEach(e => e.remove());
+            crime.map((w) => {
+                var p = document.createElement("p")
+                setTimeout(() => {
+                    
+                }, 40);
+                if(w.name.toLowerCase().includes(document.getElementById("searchField").value.toLowerCase())) {
+                    p.innerText = w["name"]
+                    p.className = "SearchResult"
+                    p.addEventListener("click", function() {addCrime(w)})
+                    document.getElementById("searchBoxResult").append(p)
+                }  
+            })
+        }
+
+        function addCrime(element) {
+            document.getElementById("Straftaten").value = ""
+            var totalPrison = 0
+            var totalMoney = 0
+
+            totalCrimes.push(element)
+            document.getElementById("table").remove()
+            var table = document.createElement("table")
+            table.id = "table"
+            document.getElementById("tableContainer").append(table)
+            var names = document.createElement("th")
+            var prisons = document.createElement("th")
+            var moneys = document.createElement("th")
+            names.innerText = "Name"
+            prisons.innerText = "Hafteinheiten"
+            moneys.innerText = "Geldstrafe"
+            table.append(names)
+            table.append(prisons)
+            table.append(moneys)
+
+            totalCrimes.map((e) => {
+                document.getElementById("Straftaten").value = document.getElementById("Straftaten").value + e.name + ", "
+                console.log("hi")
+
+                totalPrison = totalPrison + e.prison
+                totalMoney = totalMoney + e.money
+
+                var crimes = document.createElement("tr")
+                table.append(crimes)
+                var name = document.createElement("td")
+                name.innerText = e.name
+                var prison = document.createElement("td")
+                prison.innerText = e.prison
+                var money = document.createElement("td")
+                money.innerText = e.money
+
+                crimes.append(name)
+                crimes.append(prison)
+                crimes.append(money)
+            })
+            
+            document.getElementById("Straftaten").value = document.getElementById("Straftaten").value.split(", ").slice(0, -1).join(", ") + " " + document.getElementById("Straftaten").value.split(", ").slice(-1)[0];
+
+            var totalCrimesCalc = document.createElement("tr")
+            table.append(totalCrimesCalc)
+            var name = document.createElement("th")
+            name.innerText = "Kombiniert"
+            var prison = document.createElement("th")
+            prison.innerText = totalPrison
+            var money = document.createElement("th")
+            money.innerText = totalMoney
+
+            totalCrimesCalc.append(name)
+            totalCrimesCalc.append(prison)
+            totalCrimesCalc.append(money)
+        }
+
+        function copy() {
+            navigator.clipboard.writeText(document.getElementById("test").innerText)
+        }
+    </script>
+</body>
+</html>
